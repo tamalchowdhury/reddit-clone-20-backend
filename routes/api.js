@@ -2,9 +2,7 @@ const router = require('express').Router();
 const postController = require('../controllers/postController');
 
 // Get all the posts in the app
-router.get('/posts', (req, res) => {
-  res.json({ message: 'All posts will show up here..' });
-});
+router.get('/posts/all', postController.getAllPosts);
 
 // Create a new reddit post
 // TODO Add validations
