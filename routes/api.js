@@ -21,4 +21,7 @@ router.post('/posts/new', postController.submitNewPost);
 // Upvote a post
 router.post('/post/:id/upvote', postController.upvote);
 
+// Downvote a post
+router.post('/post/:id/downvote', postController.downvote);
+
 module.exports = router;

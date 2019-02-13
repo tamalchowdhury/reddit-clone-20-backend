@@ -61,11 +61,44 @@ postController.upvote = async (req, res) => {
   let response = {};
   try {
     const upvotes = req.body.upvotes.map((obj) => obj.toString());
-    const operator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
+    const downvotes = req.body.downvotes.map((obj) => obj.toString());
+
+    const upOperator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
+    // const downOperator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
+
     let user = await User.findByIdAndUpdate(
       req.body._id,
       {
-        [operator]: { upvotes: req.params.id }
+        [upOperator]: { upvotes: req.params.id }
+        // [downOperator]: { downvotes: req.params.id }
+      },
+      { new: true }
+    );
+
+    // let post = await Post.findByIdAndUpdate(
+    //   req.params.id,
+    //   {votes: }
+    // )
+
+    response.user = user;
+    response.success = true;
+    res.json(response);
+  } catch (error) {
+    response.message = 'Could not upvote';
+    res.json(response);
+  }
+};
+
+postController.downvote = async (req, res) => {
+  let response = {};
+  try {
+    const downvotes = req.body.downvotes.map((obj) => obj.toString());
+
+    const operator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
+    let user = await User.findByIdAndUpdate(
+      req.body._id,
+      {
+        [operator]: { downvotes: req.params.id }
       },
       { new: true }
     );
@@ -73,7 +106,7 @@ postController.upvote = async (req, res) => {
     response.success = true;
     res.json(response);
   } catch (error) {
-    response.message = 'Could not upvote';
+    response.message = 'Could not downvote';
     res.json(response);
   }
 };
