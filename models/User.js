@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
+    unique: true,
     required: true
   },
   email: {
@@ -24,7 +25,19 @@ const userSchema = new mongoose.Schema({
   },
   name: {
     type: String
-  }
+  },
+  upvotes: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Post'
+    }
+  ],
+  downvotes: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Post'
+    }
+  ]
 });
 
 module.exports = mongoose.model('User', userSchema);

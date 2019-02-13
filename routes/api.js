@@ -18,4 +18,7 @@ router.post('/login', userController.login);
 // Only allow valid users to be able to post
 router.post('/posts/new', postController.submitNewPost);
 
+// Upvote a post
+router.post('/post/:id/upvote', postController.upvote);
+
 module.exports = router;
