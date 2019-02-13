@@ -10,6 +10,9 @@ router.get('/posts/all', postController.getAllPosts);
 // Issue a new token and send it to the client
 router.post('/register', userController.register);
 
+// Login api
+router.post('/login', userController.login);
+
 // Create a new reddit post
 // TODO Add validations
 // Only allow valid users to be able to post

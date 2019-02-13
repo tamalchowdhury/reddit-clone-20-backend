@@ -4,14 +4,16 @@ config.development = {
   name: 'Development',
   httpPort: 5000,
   httpsPort: 5001,
-  database: 'mongodb://localhost/reddit-clone-20'
+  database: 'mongodb://localhost/reddit-clone-20',
+  secret: 'coolcake'
 };
 
 config.production = {
   name: 'Production',
   httpPort: 80,
   httpsPort: 443,
-  database: ''
+  database: '',
+  secret: 'whateverIlike'
 };
 
 let envToExport = {};
