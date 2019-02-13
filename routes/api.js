@@ -1,8 +1,14 @@
 const router = require('express').Router();
 const postController = require('../controllers/postController');
+const userController = require('../controllers/userController');
 
 // Get all the posts in the app
 router.get('/posts/all', postController.getAllPosts);
+
+// Register user
+// TODO Validate the user registration info
+// Issue a new token and send it to the client
+router.post('/register', userController.register);
 
 // Create a new reddit post
 // TODO Add validations
