@@ -5,6 +5,7 @@ const postController = {};
 postController.getAllPosts = async (req, res) => {
   try {
     let posts = await Post.find().limit(25);
+
     let response = {};
     response.data = posts;
     response.success = true;
@@ -15,6 +16,7 @@ postController.getAllPosts = async (req, res) => {
 };
 
 // POST to the database
+// TODO only allow posting by checking the user token
 postController.submitNewPost = async (req, res) => {
   let response = {};
   try {

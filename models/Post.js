@@ -15,6 +15,10 @@ const postSchema = new mongoose.Schema({
     default: Date.now()
   },
   author: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User'
+  },
+  username: {
     type: String
   },
   votes: {
