@@ -10,6 +10,14 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String
   },
+  banned: {
+    type: Boolean,
+    default: false
+  },
+  shadowed: {
+    type: Boolean,
+    default: false
+  },
   created: {
     type: Date,
     default: Date.now()

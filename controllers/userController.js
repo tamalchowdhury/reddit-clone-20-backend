@@ -9,9 +9,13 @@ userController.register = async (req, res) => {
     let user = new User(req.body);
     await user.save();
     // Create a new token for the user
-    response.token = jwt.sign({ username: user.username }, config.secret, {
-      expiresIn: '1h'
-    });
+    response.token = jwt.sign(
+      { username: user.username, _id: user._id },
+      config.secret,
+      {
+        expiresIn: '1h'
+      }
+    );
 
     response.user = user;
     response.success = true;
@@ -32,9 +36,13 @@ userController.login = async (req, res) => {
       // Check if the password matches..
       // Delete the password/hash info then send it
       // Create a new token for the user
-      response.token = jwt.sign({ username: user.username }, config.secret, {
-        expiresIn: '1h'
-      });
+      response.token = jwt.sign(
+        { username: user.username, _id: user._id },
+        config.secret,
+        {
+          expiresIn: '1h'
+        }
+      );
       response.user = user;
       response.success = true;
       res.json(response);
