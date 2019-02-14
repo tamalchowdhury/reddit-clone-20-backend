@@ -63,24 +63,28 @@ postController.upvote = async (req, res) => {
     const upvotes = req.body.upvotes.map((obj) => obj.toString());
     const downvotes = req.body.downvotes.map((obj) => obj.toString());
 
-    const upOperator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
-    // const downOperator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
+    const operator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
 
     let user = await User.findByIdAndUpdate(
       req.body._id,
       {
-        [upOperator]: { upvotes: req.params.id }
-        // [downOperator]: { downvotes: req.params.id }
+        [operator]: { upvotes: req.params.id },
+        $pull: { downvotes: req.params.id }
       },
       { new: true }
     );
 
-    // let post = await Post.findByIdAndUpdate(
-    //   req.params.id,
-    //   {votes: }
-    // )
+    let post = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        [operator]: { upvotedby: req.body._id },
+        $pull: { downvotedby: req.body._id }
+      },
+      { new: true }
+    );
 
     response.user = user;
+    response.post = post;
     response.success = true;
     res.json(response);
   } catch (error) {
@@ -98,11 +102,23 @@ postController.downvote = async (req, res) => {
     let user = await User.findByIdAndUpdate(
       req.body._id,
       {
-        [operator]: { downvotes: req.params.id }
+        [operator]: { downvotes: req.params.id },
+        $pull: { upvotes: req.params.id }
       },
       { new: true }
     );
+
+    let post = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        [operator]: { downvotedby: req.body._id },
+        $pull: { upvotedby: req.body._id }
+      },
+      { new: true }
+    );
+
     response.user = user;
+    response.post = post;
     response.success = true;
     res.json(response);
   } catch (error) {

@@ -24,7 +24,19 @@ const postSchema = new mongoose.Schema({
   votes: {
     type: Number,
     default: 0
-  }
+  },
+  upvotedby: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User'
+    }
+  ],
+  downvotedby: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User'
+    }
+  ]
 });
 
 module.exports = mongoose.model('Post', postSchema);
