@@ -136,6 +136,7 @@ postController.deletePost = async (req, res) => {
     await Post.findByIdAndDelete({ _id: req.params.id });
     response.success = true;
     response.message = 'Successfully deleted the post!';
+    response.deletedId = req.params.id;
     res.json(response);
   } catch (error) {
     response.message = 'Could not delete';
