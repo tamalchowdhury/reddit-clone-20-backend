@@ -127,4 +127,20 @@ postController.downvote = async (req, res) => {
   }
 };
 
+postController.deletePost = async (req, res) => {
+  // Check if the token is valid,
+  // Check if the user owns the post
+  // Check if the user is an admin
+  let response = {};
+  try {
+    await Post.findByIdAndDelete({ _id: req.params.id });
+    response.success = true;
+    response.message = 'Successfully deleted the post!';
+    res.json(response);
+  } catch (error) {
+    response.message = 'Could not delete';
+    res.json(response);
+  }
+};
+
 module.exports = postController;

@@ -24,4 +24,7 @@ router.post('/post/:id/upvote', postController.upvote);
 // Downvote a post
 router.post('/post/:id/downvote', postController.downvote);
 
+// Delete a post
+router.delete('/post/:id/delete', postController.deletePost);
+
 module.exports = router;
