@@ -4,6 +4,26 @@ const config = require('../config');
 const jwt = require('jsonwebtoken');
 const postController = {};
 
+// Verify token middleware
+postController.verifyToken = (req, res, next) => {
+  let response = {};
+  try {
+    let recievedToken = req.headers.authorization.split(' ')[1];
+    let decodedToken = jwt.verify(recievedToken, config.secret);
+
+    // Check if the token is valid
+    if (decodedToken.exp * 1000 > Date.now()) {
+      next();
+    } else {
+      response.message = 'The token is not valid or expired!';
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `There was an error with checking the token ${error}`;
+    res.json(response);
+  }
+};
+
 // GET all the posts in the reddit sub
 postController.getAllPosts = async (req, res) => {
   try {
@@ -23,35 +43,21 @@ postController.getAllPosts = async (req, res) => {
 postController.submitNewPost = async (req, res) => {
   let response = {};
   try {
-    let recievedToken = req.headers.authorization.split(' ')[1];
-    let decodedToken = jwt.verify(recievedToken, config.secret);
+    // Now check if the user exists and is not banned!
+    let checkedUser = await User.findById(req.body.author);
+    if (checkedUser && !checkedUser.banned) {
+      // Continue checking
 
-    // Check if the token is valid
-    if (
-      decodedToken._id == req.body.author &&
-      decodedToken.exp * 1000 > Date.now()
-    ) {
-      console.log('Token is valid!');
-      // Now check if the user exists and is not banned!
-      let checkedUser = await User.findById(req.body.author);
-      if (checkedUser && !checkedUser.banned) {
-        // Continue checking
-
-        let post = new Post(req.body);
-        await post.save();
-        response.data = post;
-        response.success = true;
-        res.json(response);
-      } else {
-        response.message = 'You are not allowed to post!';
-        res.json(response);
-      }
+      let post = new Post(req.body);
+      await post.save();
+      response.data = post;
+      response.success = true;
+      res.json(response);
     } else {
-      response.message = 'The token is not valid or expired.';
+      response.message = 'You are not allowed to post!';
       res.json(response);
     }
   } catch (error) {
-    response.success = false;
     response.message = `Could not submit post, check error: ${error}`;
     res.json(response);
   }

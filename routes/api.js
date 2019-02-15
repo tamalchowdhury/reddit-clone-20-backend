@@ -16,15 +16,31 @@ router.post('/login', userController.login);
 // Create a new reddit post
 // TODO Add validations
 // Only allow valid users to be able to post
-router.post('/posts/new', postController.submitNewPost);
+router.post(
+  '/posts/new',
+  postController.verifyToken,
+  postController.submitNewPost
+);
 
 // Upvote a post
-router.post('/post/:id/upvote', postController.upvote);
+router.post(
+  '/post/:id/upvote',
+  postController.verifyToken,
+  postController.upvote
+);
 
 // Downvote a post
-router.post('/post/:id/downvote', postController.downvote);
+router.post(
+  '/post/:id/downvote',
+  postController.verifyToken,
+  postController.downvote
+);
 
 // Delete a post
-router.delete('/post/:id/delete', postController.deletePost);
+router.delete(
+  '/post/:id/delete',
+  postController.verifyToken,
+  postController.deletePost
+);
 
 module.exports = router;
