@@ -21,9 +21,9 @@ const postSchema = new mongoose.Schema({
   username: {
     type: String
   },
-  votes: {
+  score: {
     type: Number,
-    default: 0
+    default: 1
   },
   upvotedby: [
     {

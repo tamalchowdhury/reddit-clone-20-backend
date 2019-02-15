@@ -24,10 +24,28 @@ postController.verifyToken = (req, res, next) => {
   }
 };
 
+postController.checkIfUserExistsAndIsNotBanned = async (req, res, next) => {
+  let response = {};
+  try {
+    let checkedUser = await User.findById(req.body.author);
+    if (checkedUser && !checkedUser.banned) {
+      next();
+    } else {
+      response.message = 'You are not authorized to take this action!';
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `Something went wrong trying to check the user ${error}`;
+    res.json(response);
+  }
+};
+
 // GET all the posts in the reddit sub
 postController.getAllPosts = async (req, res) => {
   try {
-    let posts = await Post.find().limit(25);
+    let posts = await Post.find()
+      .sort({ score: 1 })
+      .limit(25);
 
     let response = {};
     response.data = posts;
@@ -43,20 +61,25 @@ postController.getAllPosts = async (req, res) => {
 postController.submitNewPost = async (req, res) => {
   let response = {};
   try {
-    // Now check if the user exists and is not banned!
-    let checkedUser = await User.findById(req.body.author);
-    if (checkedUser && !checkedUser.banned) {
-      // Continue checking
+    let post = new Post(req.body);
+    post.upvotedby = req.body.author;
+    await post.save();
 
-      let post = new Post(req.body);
-      await post.save();
-      response.data = post;
-      response.success = true;
-      res.json(response);
-    } else {
-      response.message = 'You are not allowed to post!';
-      res.json(response);
-    }
+    // Also add this post to user upvotes
+    let user = await User.findByIdAndUpdate(
+      { _id: req.body.author },
+      {
+        $addToSet: { upvotes: post._id }
+      },
+      { new: true }
+    );
+
+    // TODO Delete the sensitive info from user
+
+    response.post = post;
+    response.user = user;
+    response.success = true;
+    res.json(response);
   } catch (error) {
     response.message = `Could not submit post, check error: ${error}`;
     res.json(response);
@@ -94,7 +117,7 @@ postController.upvote = async (req, res) => {
     response.success = true;
     res.json(response);
   } catch (error) {
-    response.message = 'Could not upvote';
+    response.message = `Could not upvote, check error: ${error}`;
     res.json(response);
   }
 };
@@ -105,6 +128,7 @@ postController.downvote = async (req, res) => {
     const downvotes = req.body.downvotes.map((obj) => obj.toString());
 
     const operator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
+
     let user = await User.findByIdAndUpdate(
       req.body._id,
       {
@@ -134,9 +158,7 @@ postController.downvote = async (req, res) => {
 };
 
 postController.deletePost = async (req, res) => {
-  // Check if the token is valid,
-  // Check if the user owns the post
-  // Check if the user is an admin
+  // TODO Check if the user owns the post or if the user is an admin
   let response = {};
   try {
     await Post.findByIdAndDelete({ _id: req.params.id });

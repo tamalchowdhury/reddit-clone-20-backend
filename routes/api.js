@@ -19,6 +19,7 @@ router.post('/login', userController.login);
 router.post(
   '/posts/new',
   postController.verifyToken,
+  postController.checkIfUserExistsAndIsNotBanned,
   postController.submitNewPost
 );
 
