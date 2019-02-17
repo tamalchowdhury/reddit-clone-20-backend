@@ -4,17 +4,19 @@ const config = require('./config');
 const routes = require('./routes/api');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const expressValidator = require('express-validator');
 
 const server = {};
 
 mongoose.connect(config.database);
 mongoose.Promise = global.Promise;
-mongoose.connection.on('error', () => {
+mongoose.connection.on('error', (err) => {
   console.log('Error in the database:', err);
 });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(expressValidator());
 
 server.init = function() {
   app.use('/api', routes);

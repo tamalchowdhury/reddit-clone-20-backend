@@ -5,12 +5,17 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "jest --watchAll"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "express-validator": "^5.3.1",
     "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.4.11"
+  },
+  "devDependencies": {
+    "jest": "^24.1.0"
   }
 }

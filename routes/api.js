@@ -8,7 +8,11 @@ router.get('/posts/all', postController.getAllPosts);
 // Register user
 // TODO Validate the user registration info
 // Issue a new token and send it to the client
-router.post('/register', userController.register);
+router.post(
+  '/register',
+  userController.validateRegInfo,
+  userController.register
+);
 
 // Login api
 router.post('/login', userController.login);

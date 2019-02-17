@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String
   },
-  password: {
+  hash: {
+    type: String
+  },
+  salt: {
     type: String
   },
   banned: {
