@@ -23,4 +23,14 @@ helpers.generateSalt = () => {
   }
 };
 
+helpers.stripTheUserData = (userObject) => {
+  if (typeof userObject == 'object') {
+    userObject.hash = undefined;
+    userObject.salt = undefined;
+    return userObject;
+  } else {
+    return {};
+  }
+};
+
 module.exports = helpers;

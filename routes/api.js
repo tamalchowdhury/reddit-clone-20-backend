@@ -15,7 +15,7 @@ router.post(
 );
 
 // Login api
-router.post('/login', userController.login);
+router.post('/login', userController.validateLoginInfo, userController.login);
 
 // Create a new reddit post
 // TODO Add validations

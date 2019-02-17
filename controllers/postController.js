@@ -1,6 +1,7 @@
 const Post = require('../models/Post');
 const User = require('../models/User');
 const config = require('../config');
+const helpers = require('../helpers/helpers');
 const jwt = require('jsonwebtoken');
 const postController = {};
 
@@ -77,7 +78,7 @@ postController.submitNewPost = async (req, res) => {
     // TODO Delete the sensitive info from user
 
     response.post = post;
-    response.user = user;
+    response.user = helpers.stripTheUserData(user);
     response.success = true;
     res.json(response);
   } catch (error) {
@@ -112,7 +113,7 @@ postController.upvote = async (req, res) => {
       { new: true }
     );
 
-    response.user = user;
+    response.user = helpers.stripTheUserData(user);
     response.post = post;
     response.success = true;
     res.json(response);
@@ -147,7 +148,7 @@ postController.downvote = async (req, res) => {
       { new: true }
     );
 
-    response.user = user;
+    response.user = helpers.stripTheUserData(user);
     response.post = post;
     response.success = true;
     res.json(response);
