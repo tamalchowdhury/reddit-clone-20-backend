@@ -17,10 +17,12 @@ postController.verifyToken = (req, res, next) => {
       next();
     } else {
       response.message = 'The token is not valid or expired!';
+      response.tokenExpired = true;
       res.json(response);
     }
   } catch (error) {
     response.message = `There was an error with checking the token ${error}`;
+    response.tokenExpired = true;
     res.json(response);
   }
 };

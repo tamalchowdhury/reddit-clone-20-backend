@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const postController = require('../controllers/postController');
 const userController = require('../controllers/userController');
+const commentController = require('../controllers/commentController');
 
 // Get all the posts in the app
 router.get('/posts/all', postController.getAllPosts);
@@ -46,6 +47,16 @@ router.delete(
   '/post/:id/delete',
   postController.verifyToken,
   postController.deletePost
+);
+
+// Get all comments
+router.get('/post/:id/comments/all', commentController.allComments);
+
+// Post a comment
+router.post(
+  '/post/:id/comment',
+  postController.verifyToken,
+  commentController.submitComment
 );
 
 module.exports = router;
