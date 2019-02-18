@@ -59,4 +59,11 @@ router.post(
   commentController.submitComment
 );
 
+// Delete a comment
+router.delete(
+  '/post/:id/comment',
+  postController.verifyToken,
+  commentController.deleteComment
+);
+
 module.exports = router;

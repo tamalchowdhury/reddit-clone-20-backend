@@ -30,4 +30,31 @@ commentController.submitComment = async (req, res) => {
   }
 };
 
+commentController.deleteComment = async (req, res) => {
+  // TODO please delete if the user owns the comment
+  let response = {};
+  try {
+    let comment = await Comment.findById(req.params.id);
+    if (comment) {
+      // Check if the user is admin or owner of the comment
+      if (comment.author == req.body._id) {
+        await Comment.findByIdAndDelete(req.params.id);
+        response.success = true;
+        res.json(response);
+      } else {
+        // You don't own this comment
+        response.message = "You can't delete that comment";
+        res.json(response);
+      }
+    } else {
+      // No comment found to delete
+      response.message = 'No such comment exists to delete';
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `Server encountered an error while deleting a comment ${error}`;
+    res.json(response);
+  }
+};
+
 module.exports = commentController;
