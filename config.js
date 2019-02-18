@@ -18,10 +18,10 @@ config.production = {
 
 let envToExport = {};
 
-if (process.env.NODE_ENV == 'development') {
-  envToExport = config.development;
-} else {
+if (process.env.NODE_ENV == 'production') {
   envToExport = config.production;
+} else {
+  envToExport = config.development;
 }
 
 module.exports = envToExport;

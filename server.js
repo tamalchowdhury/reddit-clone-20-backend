@@ -18,13 +18,14 @@ mongoose.connection.on('error', (err) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
+app.use(express.static(path.join(__dirname, 'client')));
 
 server.init = function() {
   app.use('/api', routes);
-  app.get('/', (req, res) => {
+  app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'index.html'));
   });
-  app.use(express.static(path.join(__dirname, 'client')));
+
   app.listen(config.httpPort, () => {
     console.log(
       `We have a ${config.name} server running on PORT: ${config.httpPort}`
