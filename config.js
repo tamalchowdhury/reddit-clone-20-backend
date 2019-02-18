@@ -1,7 +1,7 @@
 const config = {};
 
 config.development = {
-  name: 'Development',
+  name: 'development',
   httpPort: 5000,
   httpsPort: 5001,
   database: 'mongodb://localhost/reddit-clone-20',
@@ -9,19 +9,19 @@ config.development = {
 };
 
 config.production = {
-  name: 'Production',
+  name: 'production',
   httpPort: 80,
   httpsPort: 443,
-  database: '',
+  database: 'mongodb://tamal:reddit2@ds119930.mlab.com:19930/reddit-clone-20',
   secret: 'whateverIlike'
 };
 
 let envToExport = {};
 
-if (process.env.NODE_ENV == 'Production') {
-  envToExport = config.production;
-} else {
+if (process.env.NODE_ENV == 'development') {
   envToExport = config.development;
+} else {
+  envToExport = config.production;
 }
 
 module.exports = envToExport;

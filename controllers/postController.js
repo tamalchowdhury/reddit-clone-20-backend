@@ -175,4 +175,17 @@ postController.deletePost = async (req, res) => {
   }
 };
 
+postController.getAllPostsByUser = async (req, res) => {
+  let response = {};
+  try {
+    let posts = await Post.find({ username: req.params.username }).limit(25);
+    response.posts = posts;
+    response.success = true;
+    res.json(response);
+  } catch (error) {
+    response.message = `The server encountered an error while getting all the posts ${error}`;
+    res.json(response);
+  }
+};
+
 module.exports = postController;

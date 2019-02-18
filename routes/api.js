@@ -6,6 +6,9 @@ const commentController = require('../controllers/commentController');
 // Get all the posts in the app
 router.get('/posts/all', postController.getAllPosts);
 
+// Get all the posts by the user
+router.get('/user/:username/posts', postController.getAllPostsByUser);
+
 // Register user
 // TODO Validate the user registration info
 // Issue a new token and send it to the client

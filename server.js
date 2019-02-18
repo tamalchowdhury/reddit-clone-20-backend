@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const app = express();
 const config = require('./config');
@@ -20,6 +21,10 @@ app.use(expressValidator());
 
 server.init = function() {
   app.use('/api', routes);
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'index.html'));
+  });
+  app.use(express.static(path.join(__dirname, 'client')));
   app.listen(config.httpPort, () => {
     console.log(
       `We have a ${config.name} server running on PORT: ${config.httpPort}`
