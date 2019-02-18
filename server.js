@@ -20,17 +20,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 app.use(express.static(path.join(__dirname, 'client')));
 
-server.init = function() {
-  app.use('/api', routes);
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'index.html'));
-  });
+app.use('/api', routes);
 
-  app.listen(config.httpPort, () => {
-    console.log(
-      `We have a ${config.name} server running on PORT: ${config.httpPort}`
-    );
-  });
-};
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'index.html'));
+});
+
+app.listen(config.httpPort, () => {
+  console.log(
+    `We have a ${config.name} server running on PORT: ${config.httpPort}`
+  );
+});
 
 module.exports = server;
