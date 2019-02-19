@@ -6,6 +6,8 @@ const commentController = require('../controllers/commentController');
 // Get all the posts in the app
 router.get('/posts/all', postController.getAllPosts);
 
+router.get('/posts/:skip/:page', postController.getNextPosts);
+
 // Get all the posts by the user
 router.get('/user/:username/posts', postController.getAllPostsByUser);
 

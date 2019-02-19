@@ -45,17 +45,37 @@ postController.checkIfUserExistsAndIsNotBanned = async (req, res, next) => {
 
 // GET all the posts in the reddit sub
 postController.getAllPosts = async (req, res) => {
+  let response = {};
   try {
     let posts = await Post.find()
-      .sort({ score: 1 })
-      .limit(25);
-
-    let response = {};
+      .sort({ created: -1 })
+      .limit(5);
     response.data = posts;
     response.success = true;
     res.json(response);
   } catch (error) {
-    res.json({ success: false });
+    response.message = 'Error getting the next posts';
+    res.json(response);
+  }
+};
+
+postController.getNextPosts = async (req, res) => {
+  let response = {};
+  try {
+    let { skip, page } = req.params;
+    parseInt(skip);
+    parseInt(page);
+    let skipBy = skip * page;
+    let posts = await Post.find()
+      .sort({ created: -1 })
+      .skip(skipBy)
+      .limit(5);
+    response.posts = posts;
+    response.success = true;
+    res.json(response);
+  } catch (error) {
+    response.message = `Error getting the next posts ${error}`;
+    res.json(response);
   }
 };
 
