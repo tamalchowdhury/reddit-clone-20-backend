@@ -6,6 +6,7 @@ const routes = require('./routes/api');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const expressValidator = require('express-validator');
+const helmet = require('helmet');
 
 const server = {};
 
@@ -15,6 +16,7 @@ mongoose.connection.on('error', (err) => {
   console.log('Error in the database:', err);
 });
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());

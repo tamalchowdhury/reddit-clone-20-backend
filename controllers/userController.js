@@ -113,7 +113,7 @@ userController.login = async (req, res) => {
     let { username, password } = req.body;
     // Check if the user exists
     let user = await User.findOne({ username });
-    if (user.hash && user.salt) {
+    if (user && user.hash && user.salt) {
       // TODO
       // Check if the password matches..
       let hashedPassword = helpers.hashThePassword(password, user.salt);
@@ -141,7 +141,7 @@ userController.login = async (req, res) => {
       res.json(response);
     }
   } catch (error) {
-    res.message = error;
+    res.message = `The server got an error while trying to check the username`;
     res.json(response);
   }
 };
