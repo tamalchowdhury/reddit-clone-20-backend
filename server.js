@@ -27,10 +27,10 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'index.html'));
 });
 
-app.listen(config.httpPort, () => {
-  console.log(
-    `We have a ${config.name} server running on PORT: ${config.httpPort}`
-  );
+const PORT = process.env.PORT || config.httpPort;
+
+app.listen(PORT, () => {
+  console.log(`We have a ${config.name} server running on PORT: ${PORT}`);
 });
 
 module.exports = server;
