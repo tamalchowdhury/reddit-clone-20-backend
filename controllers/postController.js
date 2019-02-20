@@ -49,7 +49,7 @@ postController.getAllPosts = async (req, res) => {
   try {
     let posts = await Post.find()
       .sort({ created: -1 })
-      .limit(5);
+      .limit(50);
     response.data = posts;
     response.success = true;
     res.json(response);
@@ -69,7 +69,7 @@ postController.getNextPosts = async (req, res) => {
     let posts = await Post.find()
       .sort({ created: -1 })
       .skip(skipBy)
-      .limit(5);
+      .limit(50);
     response.posts = posts;
     response.success = true;
     res.json(response);
