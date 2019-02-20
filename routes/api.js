@@ -71,4 +71,14 @@ router.delete(
   commentController.deleteComment
 );
 
+// Admin Actions
+// Possible actions:
+// BAN, UNBAN, MAKEADMIN, REMOVEADMIN
+// Why not do all of them with one controller
+router.post(
+  '/user/:username/action/:action',
+  postController.verifyToken,
+  userController.adminAction
+);
+
 module.exports = router;

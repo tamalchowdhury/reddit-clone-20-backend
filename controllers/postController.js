@@ -117,14 +117,26 @@ postController.upvote = async (req, res) => {
 
     const operator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
 
-    let user = await User.findByIdAndUpdate(
-      req.body._id,
-      {
-        [operator]: { upvotes: req.params.id },
-        $pull: { downvotes: req.params.id }
-      },
-      { new: true }
-    );
+    let user;
+
+    if (downvotes.includes(req.params.id)) {
+      user = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          $addToSet: { upvotes: req.params.id },
+          $pull: { downvotes: req.params.id }
+        },
+        { new: true }
+      );
+    } else {
+      user = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          [operator]: { upvotes: req.params.id }
+        },
+        { new: true }
+      );
+    }
 
     let post = await Post.findByIdAndUpdate(
       req.params.id,
@@ -148,18 +160,30 @@ postController.upvote = async (req, res) => {
 postController.downvote = async (req, res) => {
   let response = {};
   try {
+    const upvotes = req.body.upvotes.map((obj) => obj.toString());
     const downvotes = req.body.downvotes.map((obj) => obj.toString());
 
     const operator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
 
-    let user = await User.findByIdAndUpdate(
-      req.body._id,
-      {
-        [operator]: { downvotes: req.params.id },
-        $pull: { upvotes: req.params.id }
-      },
-      { new: true }
-    );
+    let user;
+    if (upvotes.includes(req.params.id)) {
+      user = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          $addToSet: { downvotes: req.params.id },
+          $pull: { upvotes: req.params.id }
+        },
+        { new: true }
+      );
+    } else {
+      user = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          [operator]: { downvotes: req.params.id }
+        },
+        { new: true }
+      );
+    }
 
     let post = await Post.findByIdAndUpdate(
       req.params.id,
@@ -198,8 +222,10 @@ postController.deletePost = async (req, res) => {
 postController.getAllPostsByUser = async (req, res) => {
   let response = {};
   try {
-    let posts = await Post.find({ username: req.params.username }).limit(25);
+    let posts = await Post.find({ username: req.params.username }).limit(50);
+    let currentUser = await User.findOne({ username: req.params.username });
     response.posts = posts;
+    response.currentUser = helpers.stripTheUserData(currentUser);
     response.success = true;
     res.json(response);
   } catch (error) {

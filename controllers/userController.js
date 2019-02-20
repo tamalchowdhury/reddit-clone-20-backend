@@ -92,7 +92,7 @@ userController.register = async (req, res) => {
         { username: user.username, _id: user._id },
         config.secret,
         {
-          expiresIn: '1h'
+          expiresIn: '1d'
         }
       );
 
@@ -125,7 +125,7 @@ userController.login = async (req, res) => {
           { username: user.username, _id: user._id },
           config.secret,
           {
-            expiresIn: '1h'
+            expiresIn: '1d'
           }
         );
 
@@ -142,6 +142,78 @@ userController.login = async (req, res) => {
     }
   } catch (error) {
     res.message = `The server got an error while trying to check the username`;
+    res.json(response);
+  }
+};
+
+userController.adminAction = async (req, res) => {
+  let response = {};
+  try {
+    // Check if the authorized user is actually an admin
+    let { isAdmin, _id } = req.body;
+    if (isAdmin) {
+      let adminUser = await User.findById(_id);
+      if (adminUser.isAdmin) {
+        // Continue performing the action
+        // Find the user to perform the action
+        let theUser = await User.findOne({ username: req.params.username });
+        if (theUser) {
+          let updatedUser;
+          switch (req.params.action) {
+            // Possible actions:
+            // BAN, UNBAN, MAKEADMIN, REMOVEADMIN
+            case 'ban':
+              updatedUser = await User.findByIdAndUpdate(
+                theUser._id,
+                { banned: true, isAdmin: false },
+                { new: true }
+              );
+              break;
+            case 'unban':
+              updatedUser = await User.findByIdAndUpdate(
+                theUser._id,
+                { banned: false },
+                { new: true }
+              );
+              break;
+            case 'makeadmin':
+              updatedUser = await User.findByIdAndUpdate(
+                theUser._id,
+                { isAdmin: true, banned: false },
+                { new: true }
+              );
+              break;
+            case 'removeadmin':
+              updatedUser = await User.findByIdAndUpdate(
+                theUser._id,
+                { isAdmin: false },
+                { new: true }
+              );
+              break;
+            default:
+              return null;
+          }
+          response.success = true;
+          response.currentUser = helpers.stripTheUserData(updatedUser);
+          response.message = `Successfully performed the action ${
+            req.params.action
+          } on the user ${req.params.username}`;
+          res.json(response);
+        } else {
+          // The user was not found or he/she is already an admin;
+          response.message = 'The given user does not exists';
+          res.json(response);
+        }
+      } else {
+        response.message = 'You are not an admin to do that.';
+        res.json(response);
+      }
+    } else {
+      response.message = 'You are not authorized to perform this action';
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `There was an error performing this action ${error}`;
     res.json(response);
   }
 };
