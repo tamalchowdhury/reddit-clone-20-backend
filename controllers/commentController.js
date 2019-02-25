@@ -67,6 +67,8 @@ commentController.upvote = async (req, res) => {
     let comment = await Comment.findById(commentId);
     if (comment) {
       let allUpvotes = comment.upvotedby.map((obj) => obj.toString());
+      let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
+
       let operator = allUpvotes.includes(upvotedbyId) ? '$pull' : '$addToSet';
 
       // Add/Remove that upvote to the post
@@ -77,6 +79,18 @@ commentController.upvote = async (req, res) => {
         },
         { new: true }
       );
+
+      // If the post was already downvoted, then remove the downvote
+      if (allDownvotes.includes(upvotedbyId)) {
+        updatedComment = await Comment.findByIdAndUpdate(
+          commentId,
+          {
+            $pull: { downvotedby: upvotedbyId }
+          },
+          { new: true }
+        );
+      }
+
       // Send the updated comment back to the client for storing & display
       response.success = true;
       response.comment = updatedComment;
@@ -101,6 +115,7 @@ commentController.downvote = async (req, res) => {
     let comment = await Comment.findById(commentId);
     if (comment) {
       let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
+      let allUpvotes = comment.upvotedby.map((obj) => obj.toString());
       let operator = allDownvotes.includes(downvotedbyId)
         ? '$pull'
         : '$addToSet';
@@ -113,6 +128,17 @@ commentController.downvote = async (req, res) => {
         },
         { new: true }
       );
+      // If the post was already upvoted, then remove the upvote
+      if (allUpvotes.includes(downvotedbyId)) {
+        updatedComment = await Comment.findByIdAndUpdate(
+          commentId,
+          {
+            $pull: { upvotedby: downvotedbyId }
+          },
+          { new: true }
+        );
+      }
+
       // Send the updated comment back to the client for storing & display
       response.success = true;
       response.comment = updatedComment;
