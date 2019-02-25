@@ -71,6 +71,20 @@ router.delete(
   commentController.deleteComment
 );
 
+// Upvote a comment
+router.put(
+  '/comment/:id/upvote',
+  postController.verifyToken,
+  commentController.upvote
+);
+
+// Downvote a comment
+router.put(
+  '/comment/:id/downvote',
+  postController.verifyToken,
+  commentController.downvote
+);
+
 // Admin Actions
 // Possible actions:
 // BAN, UNBAN, MAKEADMIN, REMOVEADMIN
