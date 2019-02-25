@@ -91,6 +91,40 @@ commentController.upvote = async (req, res) => {
   }
 };
 
-commentController.downvote = async (req, res) => {};
+commentController.downvote = async (req, res) => {
+  let downvotedbyId = req.body._id;
+  let commentId = req.params.id;
+  let response = {};
+  try {
+    // 1. Find the given comment
+    // 2. add the downvote to the comment
+    let comment = await Comment.findById(commentId);
+    if (comment) {
+      let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
+      let operator = allDownvotes.includes(downvotedbyId)
+        ? '$pull'
+        : '$addToSet';
+
+      // Add/Remove that upvote to the post
+      let updatedComment = await Comment.findByIdAndUpdate(
+        commentId,
+        {
+          [operator]: { downvotedby: downvotedbyId }
+        },
+        { new: true }
+      );
+      // Send the updated comment back to the client for storing & display
+      response.success = true;
+      response.comment = updatedComment;
+      res.json(response);
+    } else {
+      response.message = `The comment does not exists`;
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `Server encountered an error while downvoting a comment ${error}`;
+    res.json(response);
+  }
+};
 
 module.exports = commentController;

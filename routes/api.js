@@ -78,6 +78,13 @@ router.put(
   commentController.upvote
 );
 
+// Downvote a comment
+router.put(
+  '/comment/:id/downvote',
+  postController.verifyToken,
+  commentController.downvote
+);
+
 // Admin Actions
 // Possible actions:
 // BAN, UNBAN, MAKEADMIN, REMOVEADMIN
