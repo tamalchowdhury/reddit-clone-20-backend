@@ -118,8 +118,27 @@ postController.upvote = async (req, res) => {
     const operator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
 
     let user;
+    let post;
 
-    if (downvotes.includes(req.params.id)) {
+    // if upvote already exists, remove from upvotes
+    if (upvotes.includes(req.params.id)) {
+      user = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          $pull: { upvotes: req.params.id }
+        },
+        { new: true }
+      );
+      post = await Post.findByIdAndUpdate(
+        req.params.id,
+        {
+          $pull: { upvotedby: req.body._id }
+        },
+        { new: true }
+      );
+    } else {
+      // Add to upvotes
+      // Remove from downvotes
       user = await User.findByIdAndUpdate(
         req.body._id,
         {
@@ -128,24 +147,15 @@ postController.upvote = async (req, res) => {
         },
         { new: true }
       );
-    } else {
-      user = await User.findByIdAndUpdate(
-        req.body._id,
+      post = await Post.findByIdAndUpdate(
+        req.params.id,
         {
-          [operator]: { upvotes: req.params.id }
+          $addToSet: { upvotedby: req.body._id },
+          $pull: { downvotedby: req.body._id }
         },
         { new: true }
       );
     }
-
-    let post = await Post.findByIdAndUpdate(
-      req.params.id,
-      {
-        [operator]: { upvotedby: req.body._id },
-        $pull: { downvotedby: req.body._id }
-      },
-      { new: true }
-    );
 
     response.user = helpers.stripTheUserData(user);
     response.post = post;
@@ -166,7 +176,29 @@ postController.downvote = async (req, res) => {
     const operator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
 
     let user;
-    if (upvotes.includes(req.params.id)) {
+    let post;
+
+    // Downvoting..
+
+    // if downvote already exists, remove from downvotes
+    if (downvotes.includes(req.params.id)) {
+      user = await User.findByIdAndUpdate(
+        req.body._id,
+        {
+          $pull: { downvotes: req.params.id }
+        },
+        { new: true }
+      );
+      post = await Post.findByIdAndUpdate(
+        req.params.id,
+        {
+          $pull: { downvotedby: req.body._id }
+        },
+        { new: true }
+      );
+    } else {
+      // Add to downvotes
+      // Remove from upvotes
       user = await User.findByIdAndUpdate(
         req.body._id,
         {
@@ -175,24 +207,15 @@ postController.downvote = async (req, res) => {
         },
         { new: true }
       );
-    } else {
-      user = await User.findByIdAndUpdate(
-        req.body._id,
+      post = await Post.findByIdAndUpdate(
+        req.params.id,
         {
-          [operator]: { downvotes: req.params.id }
+          $addToSet: { downvotedby: req.body._id },
+          $pull: { upvotedby: req.body._id }
         },
         { new: true }
       );
     }
-
-    let post = await Post.findByIdAndUpdate(
-      req.params.id,
-      {
-        [operator]: { downvotedby: req.body._id },
-        $pull: { upvotedby: req.body._id }
-      },
-      { new: true }
-    );
 
     response.user = helpers.stripTheUserData(user);
     response.post = post;
