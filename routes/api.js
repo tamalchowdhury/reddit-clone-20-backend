@@ -37,14 +37,14 @@ router.post(
 );
 
 // Upvote a post
-router.post(
+router.put(
   '/post/:id/upvote',
   postController.verifyToken,
   postController.upvote
 );
 
 // Downvote a post
-router.post(
+router.put(
   '/post/:id/downvote',
   postController.verifyToken,
   postController.downvote

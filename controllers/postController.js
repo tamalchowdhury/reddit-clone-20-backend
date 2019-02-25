@@ -135,57 +135,51 @@ postController.getSinglePostAndComments = async (req, res) => {
 postController.upvote = async (req, res) => {
   let response = {};
   try {
-    const upvotes = req.body.upvotes.map((obj) => obj.toString());
-    const downvotes = req.body.downvotes.map((obj) => obj.toString());
+    let postId = req.params.id;
+    let userId = req.body.userId;
+    // Check if the user is not banned
+    let user = await User.findById(userId);
+    // Continue if the user is not banned
+    if (user && !user.banned) {
+      // Find the post to be upvoted
+      let post = await Post.findById(postId);
+      if (post) {
+        let allUpvotes = post.upvotedby.map((obj) => obj.toString());
+        let allDownvotes = post.downvotedby.map((obj) => obj.toString());
+        let operator = allUpvotes.includes(userId) ? '$pull' : '$addToSet';
 
-    const operator = upvotes.includes(req.params.id) ? '$pull' : '$addToSet';
-
-    let user;
-    let post;
-
-    // if upvote already exists, remove from upvotes
-    if (upvotes.includes(req.params.id)) {
-      user = await User.findByIdAndUpdate(
-        req.body._id,
-        {
-          $pull: { upvotes: req.params.id }
-        },
-        { new: true }
-      );
-      post = await Post.findByIdAndUpdate(
-        req.params.id,
-        {
-          $pull: { upvotedby: req.body._id }
-        },
-        { new: true }
-      );
+        // Add or remove the upvote from the post
+        let updatedPost = await Post.findByIdAndUpdate(
+          postId,
+          {
+            [operator]: { upvotedby: userId }
+          },
+          { new: true }
+        );
+        // If the post was already downvoted, then remove the downvote
+        if (allDownvotes.includes(userId)) {
+          updatedPost = await Post.findByIdAndUpdate(
+            postId,
+            {
+              $pull: { downvotedby: userId }
+            },
+            { new: true }
+          );
+        }
+        // Send the updated comment back to the client for storing & display
+        response.success = true;
+        response.post = updatedPost;
+        res.json(response);
+      } else {
+        response.message = 'The post was not found';
+        res.json(response);
+      }
     } else {
-      // Add to upvotes
-      // Remove from downvotes
-      user = await User.findByIdAndUpdate(
-        req.body._id,
-        {
-          $addToSet: { upvotes: req.params.id },
-          $pull: { downvotes: req.params.id }
-        },
-        { new: true }
-      );
-      post = await Post.findByIdAndUpdate(
-        req.params.id,
-        {
-          $addToSet: { upvotedby: req.body._id },
-          $pull: { downvotedby: req.body._id }
-        },
-        { new: true }
-      );
+      response.message = 'The user was not found or is banned';
+      res.json(response);
     }
-
-    response.user = helpers.stripTheUserData(user);
-    response.post = post;
-    response.success = true;
-    res.json(response);
-  } catch (error) {
-    response.message = `Could not upvote, check error: ${error}`;
+  } catch (err) {
+    response.message = `Could not upvote, check error ${err}`;
     res.json(response);
   }
 };
@@ -193,59 +187,51 @@ postController.upvote = async (req, res) => {
 postController.downvote = async (req, res) => {
   let response = {};
   try {
-    const upvotes = req.body.upvotes.map((obj) => obj.toString());
-    const downvotes = req.body.downvotes.map((obj) => obj.toString());
+    let postId = req.params.id;
+    let userId = req.body.userId;
+    // Check if the user is not banned
+    let user = await User.findById(userId);
+    // Continue if the user is not banned
+    if (user && !user.banned) {
+      // Find the post to be upvoted
+      let post = await Post.findById(postId);
+      if (post) {
+        let allUpvotes = post.upvotedby.map((obj) => obj.toString());
+        let allDownvotes = post.downvotedby.map((obj) => obj.toString());
+        let operator = allDownvotes.includes(userId) ? '$pull' : '$addToSet';
 
-    const operator = downvotes.includes(req.params.id) ? '$pull' : '$addToSet';
-
-    let user;
-    let post;
-
-    // Downvoting..
-
-    // if downvote already exists, remove from downvotes
-    if (downvotes.includes(req.params.id)) {
-      user = await User.findByIdAndUpdate(
-        req.body._id,
-        {
-          $pull: { downvotes: req.params.id }
-        },
-        { new: true }
-      );
-      post = await Post.findByIdAndUpdate(
-        req.params.id,
-        {
-          $pull: { downvotedby: req.body._id }
-        },
-        { new: true }
-      );
+        // Add or remove the downvote from the post
+        let updatedPost = await Post.findByIdAndUpdate(
+          postId,
+          {
+            [operator]: { downvotedby: userId }
+          },
+          { new: true }
+        );
+        // If the post was already upvoted, then remove the downvote
+        if (allUpvotes.includes(userId)) {
+          updatedPost = await Post.findByIdAndUpdate(
+            postId,
+            {
+              $pull: { upvotedby: userId }
+            },
+            { new: true }
+          );
+        }
+        // Send the updated comment back to the client for storing & display
+        response.success = true;
+        response.post = updatedPost;
+        res.json(response);
+      } else {
+        response.message = 'The post was not found';
+        res.json(response);
+      }
     } else {
-      // Add to downvotes
-      // Remove from upvotes
-      user = await User.findByIdAndUpdate(
-        req.body._id,
-        {
-          $addToSet: { downvotes: req.params.id },
-          $pull: { upvotes: req.params.id }
-        },
-        { new: true }
-      );
-      post = await Post.findByIdAndUpdate(
-        req.params.id,
-        {
-          $addToSet: { downvotedby: req.body._id },
-          $pull: { upvotedby: req.body._id }
-        },
-        { new: true }
-      );
+      response.message = 'The user was not found or is banned';
+      res.json(response);
     }
-
-    response.user = helpers.stripTheUserData(user);
-    response.post = post;
-    response.success = true;
-    res.json(response);
-  } catch (error) {
-    response.message = 'Could not downvote';
+  } catch (err) {
+    response.message = `Could not downvote, check error ${err}`;
     res.json(response);
   }
 };

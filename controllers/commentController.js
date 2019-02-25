@@ -1,5 +1,6 @@
 const commentController = {};
 const Comment = require('../models/Comment');
+const User = require('../models/User');
 
 // Get all comments for a single post
 commentController.allComments = async (req, res) => {
@@ -62,41 +63,48 @@ commentController.upvote = async (req, res) => {
   let commentId = req.params.id;
   let response = {};
   try {
-    // 1. Find the given comment
-    // 2. add the upvote to the comment
-    let comment = await Comment.findById(commentId);
-    if (comment) {
-      let allUpvotes = comment.upvotedby.map((obj) => obj.toString());
-      let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
+    // Check if the user exists and is not banned
+    let user = await User.findById(upvotedbyId);
+    if (user && !user.banned) {
+      // 1. Find the given comment
+      // 2. add the upvote to the comment
+      let comment = await Comment.findById(commentId);
+      if (comment) {
+        let allUpvotes = comment.upvotedby.map((obj) => obj.toString());
+        let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
 
-      let operator = allUpvotes.includes(upvotedbyId) ? '$pull' : '$addToSet';
+        let operator = allUpvotes.includes(upvotedbyId) ? '$pull' : '$addToSet';
 
-      // Add/Remove that upvote to the post
-      let updatedComment = await Comment.findByIdAndUpdate(
-        commentId,
-        {
-          [operator]: { upvotedby: upvotedbyId }
-        },
-        { new: true }
-      );
-
-      // If the post was already downvoted, then remove the downvote
-      if (allDownvotes.includes(upvotedbyId)) {
-        updatedComment = await Comment.findByIdAndUpdate(
+        // Add/Remove that upvote to the post
+        let updatedComment = await Comment.findByIdAndUpdate(
           commentId,
           {
-            $pull: { downvotedby: upvotedbyId }
+            [operator]: { upvotedby: upvotedbyId }
           },
           { new: true }
         );
-      }
 
-      // Send the updated comment back to the client for storing & display
-      response.success = true;
-      response.comment = updatedComment;
-      res.json(response);
+        // If the post was already downvoted, then remove the downvote
+        if (allDownvotes.includes(upvotedbyId)) {
+          updatedComment = await Comment.findByIdAndUpdate(
+            commentId,
+            {
+              $pull: { downvotedby: upvotedbyId }
+            },
+            { new: true }
+          );
+        }
+
+        // Send the updated comment back to the client for storing & display
+        response.success = true;
+        response.comment = updatedComment;
+        res.json(response);
+      } else {
+        response.message = 'The user does not exists';
+        res.json(response);
+      }
     } else {
-      response.message = `The comment does not exists`;
+      response.message = `The user does not exists or is banned`;
       res.json(response);
     }
   } catch (error) {
@@ -110,41 +118,48 @@ commentController.downvote = async (req, res) => {
   let commentId = req.params.id;
   let response = {};
   try {
-    // 1. Find the given comment
-    // 2. add the downvote to the comment
-    let comment = await Comment.findById(commentId);
-    if (comment) {
-      let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
-      let allUpvotes = comment.upvotedby.map((obj) => obj.toString());
-      let operator = allDownvotes.includes(downvotedbyId)
-        ? '$pull'
-        : '$addToSet';
+    // Check if the user exists and is not banned
+    let user = await User.findById(downvotedbyId);
+    if (user && !user.banned) {
+      // 1. Find the given comment
+      // 2. add the downvote to the comment
+      let comment = await Comment.findById(commentId);
+      if (comment) {
+        let allDownvotes = comment.downvotedby.map((obj) => obj.toString());
+        let allUpvotes = comment.upvotedby.map((obj) => obj.toString());
+        let operator = allDownvotes.includes(downvotedbyId)
+          ? '$pull'
+          : '$addToSet';
 
-      // Add/Remove that upvote to the post
-      let updatedComment = await Comment.findByIdAndUpdate(
-        commentId,
-        {
-          [operator]: { downvotedby: downvotedbyId }
-        },
-        { new: true }
-      );
-      // If the post was already upvoted, then remove the upvote
-      if (allUpvotes.includes(downvotedbyId)) {
-        updatedComment = await Comment.findByIdAndUpdate(
+        // Add/Remove that upvote to the post
+        let updatedComment = await Comment.findByIdAndUpdate(
           commentId,
           {
-            $pull: { upvotedby: downvotedbyId }
+            [operator]: { downvotedby: downvotedbyId }
           },
           { new: true }
         );
-      }
+        // If the post was already upvoted, then remove the upvote
+        if (allUpvotes.includes(downvotedbyId)) {
+          updatedComment = await Comment.findByIdAndUpdate(
+            commentId,
+            {
+              $pull: { upvotedby: downvotedbyId }
+            },
+            { new: true }
+          );
+        }
 
-      // Send the updated comment back to the client for storing & display
-      response.success = true;
-      response.comment = updatedComment;
-      res.json(response);
+        // Send the updated comment back to the client for storing & display
+        response.success = true;
+        response.comment = updatedComment;
+        res.json(response);
+      } else {
+        response.message = `The comment does not exists`;
+        res.json(response);
+      }
     } else {
-      response.message = `The comment does not exists`;
+      response.message = 'The user does not exists or is banned';
       res.json(response);
     }
   } catch (error) {
