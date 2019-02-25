@@ -8,6 +8,9 @@ router.get('/posts/all', postController.getAllPosts);
 
 router.get('/posts/:skip/:page', postController.getNextPosts);
 
+// Get a single post and comments
+router.get('/post/:id/single', postController.getSinglePostAndComments);
+
 // Get all the posts by the user
 router.get('/user/:username/posts', postController.getAllPostsByUser);
 

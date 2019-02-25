@@ -1,5 +1,6 @@
 const Post = require('../models/Post');
 const User = require('../models/User');
+const Comment = require('../models/Comment');
 const config = require('../config');
 const helpers = require('../helpers/helpers');
 const jwt = require('jsonwebtoken');
@@ -105,6 +106,28 @@ postController.submitNewPost = async (req, res) => {
     res.json(response);
   } catch (error) {
     response.message = `Could not submit post, check error: ${error}`;
+    res.json(response);
+  }
+};
+
+postController.getSinglePostAndComments = async (req, res) => {
+  let response = {};
+  try {
+    // Find the post
+    let post = await Post.findById(req.params.id);
+    if (post) {
+      // Find all the comments
+      let comments = await Comment.find({ post: req.params.id });
+      response.success = true;
+      response.post = post;
+      response.comments = comments;
+      res.json(response);
+    } else {
+      response.message = 'No posts found';
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `Could not get the post, check error: ${error}`;
     res.json(response);
   }
 };
