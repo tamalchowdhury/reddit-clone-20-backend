@@ -95,6 +95,15 @@ commentController.upvote = async (req, res) => {
           );
         }
 
+        // Now update the score
+        let score =
+          updatedComment.upvotedby.length - updatedComment.downvotedby.length;
+        updatedComment = await Comment.findByIdAndUpdate(
+          commentId,
+          { score },
+          { new: true }
+        );
+
         // Send the updated comment back to the client for storing & display
         response.success = true;
         response.comment = updatedComment;
@@ -149,6 +158,15 @@ commentController.downvote = async (req, res) => {
             { new: true }
           );
         }
+
+        // Now update the score
+        let score =
+          updatedComment.upvotedby.length - updatedComment.downvotedby.length;
+        updatedComment = await Comment.findByIdAndUpdate(
+          commentId,
+          { score },
+          { new: true }
+        );
 
         // Send the updated comment back to the client for storing & display
         response.success = true;
