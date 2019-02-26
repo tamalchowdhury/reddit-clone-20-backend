@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Post = require('../models/Post');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const helpers = require('../helpers/helpers');
@@ -150,70 +151,100 @@ userController.adminAction = async (req, res) => {
   let response = {};
   try {
     // Check if the authorized user is actually an admin
-    let { isAdmin, _id } = req.body;
-    if (isAdmin) {
-      let adminUser = await User.findById(_id);
-      if (adminUser.isAdmin) {
-        // Continue performing the action
-        // Find the user to perform the action
-        let theUser = await User.findOne({ username: req.params.username });
-        if (theUser) {
-          let updatedUser;
-          switch (req.params.action) {
-            // Possible actions:
-            // BAN, UNBAN, MAKEADMIN, REMOVEADMIN
-            case 'ban':
-              updatedUser = await User.findByIdAndUpdate(
-                theUser._id,
-                { banned: true, isAdmin: false },
-                { new: true }
-              );
-              break;
-            case 'unban':
-              updatedUser = await User.findByIdAndUpdate(
-                theUser._id,
-                { banned: false },
-                { new: true }
-              );
-              break;
-            case 'makeadmin':
-              updatedUser = await User.findByIdAndUpdate(
-                theUser._id,
-                { isAdmin: true, banned: false },
-                { new: true }
-              );
-              break;
-            case 'removeadmin':
-              updatedUser = await User.findByIdAndUpdate(
-                theUser._id,
-                { isAdmin: false },
-                { new: true }
-              );
-              break;
-            default:
-              return null;
-          }
-          response.success = true;
-          response.currentUser = helpers.stripTheUserData(updatedUser);
-          response.message = `Successfully performed the action ${
-            req.params.action
-          } on the user ${req.params.username}`;
-          res.json(response);
-        } else {
-          // The user was not found or he/she is already an admin;
-          response.message = 'The given user does not exists';
-          res.json(response);
+    let { userId } = req.body;
+    let { username, action } = req.params;
+    let adminUser = await User.findById(userId);
+
+    if (adminUser && adminUser.isAdmin) {
+      // Continue performing the action
+      // Find the user to perform the action
+      let theUser = await User.findOne({ username });
+      if (theUser) {
+        let updatedUser;
+        switch (action) {
+          // Possible actions:
+          // BAN, UNBAN, MAKEADMIN, REMOVEADMIN
+          case 'ban':
+            updatedUser = await User.findByIdAndUpdate(
+              theUser._id,
+              { banned: true, isAdmin: false },
+              { new: true }
+            );
+            break;
+          case 'unban':
+            updatedUser = await User.findByIdAndUpdate(
+              theUser._id,
+              { banned: false },
+              { new: true }
+            );
+            break;
+          case 'makeadmin':
+            updatedUser = await User.findByIdAndUpdate(
+              theUser._id,
+              { isAdmin: true, banned: false },
+              { new: true }
+            );
+            break;
+          case 'removeadmin':
+            updatedUser = await User.findByIdAndUpdate(
+              theUser._id,
+              { isAdmin: false },
+              { new: true }
+            );
+            break;
+          default:
+            return null;
         }
+        response.success = true;
+        response.currentUser = helpers.stripTheUserData(updatedUser);
+        response.message = `Successfully performed the action ${
+          req.params.action
+        } on the user ${req.params.username}`;
+        res.json(response);
       } else {
-        response.message = 'You are not an admin to do that.';
+        // The user was not found or he/she is already an admin;
+        response.message = 'The given user does not exists';
         res.json(response);
       }
     } else {
-      response.message = 'You are not authorized to perform this action';
+      response.message = 'You are not authorize to do that.';
       res.json(response);
     }
   } catch (error) {
     response.message = `There was an error performing this action ${error}`;
+    res.json(response);
+  }
+};
+
+// Delete a user and all the posts created by him/her/it
+userController.deleteUser = async (req, res) => {
+  let response = {};
+  try {
+    let { userId } = req.body;
+    let { username } = req.params;
+    // Check if the auth user is really an admin
+    let adminUser = await User.findById(userId);
+    if (adminUser && adminUser.isAdmin) {
+      // Now check if the user to be deleted actually exists or not
+      let usertoDelete = await User.findOne({ username });
+      if (usertoDelete) {
+        // Now delete all the posts created by that user
+        await Post.deleteMany({ author: usertoDelete._id });
+        // Now finally delete that user
+        await User.deleteOne({ _id: usertoDelete._id });
+        response.success = true;
+        response.message = `Successfully deleted the user ${username} and any posts created by them.`;
+        res.json(response);
+      } else {
+        response.message = `The given user was not found or is already deleted.`;
+        res.json(response);
+      }
+    } else {
+      response.message = `You are not authorized to perform this action`;
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `There was an error deleting this user, see error: ${error}`;
     res.json(response);
   }
 };
