@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const postController = {};
 
 // Verify token middleware
-postController.verifyToken = (req, res, next) => {
+postController.verifyToken = async (req, res, next) => {
   let response = {};
   try {
     let recievedToken = req.headers.authorization.split(' ')[1];
@@ -15,7 +15,14 @@ postController.verifyToken = (req, res, next) => {
 
     // Check if the token is valid
     if (decodedToken.exp * 1000 > Date.now()) {
-      next();
+      let validUser = await User.findById(decodedToken._id);
+      if (validUser && !validUser.banned) {
+        next();
+      } else {
+        response.message = 'The user is not valid or banned!';
+        response.tokenExpired = true;
+        res.json(response);
+      }
     } else {
       response.message = 'The token is not valid or expired!';
       response.tokenExpired = true;

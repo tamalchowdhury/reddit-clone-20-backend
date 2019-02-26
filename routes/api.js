@@ -98,4 +98,11 @@ router.post(
   userController.adminAction
 );
 
+// Delete a user
+router.delete(
+  '/user/:username',
+  postController.verifyToken,
+  userController.deleteUser
+);
+
 module.exports = router;
