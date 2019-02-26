@@ -18,6 +18,10 @@ const commentSchema = new mongoose.Schema({
   username: {
     type: String
   },
+  score: {
+    type: Number,
+    default: 1
+  },
   upvotedby: [
     {
       type: mongoose.Schema.ObjectId,

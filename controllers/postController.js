@@ -49,7 +49,7 @@ postController.getAllPosts = async (req, res) => {
   let response = {};
   try {
     let posts = await Post.find()
-      .sort({ created: -1 })
+      .sort({ score: -1 })
       .limit(50);
     response.data = posts;
     response.success = true;
@@ -68,7 +68,7 @@ postController.getNextPosts = async (req, res) => {
     parseInt(page);
     let skipBy = skip * page;
     let posts = await Post.find()
-      .sort({ created: -1 })
+      .sort({ score: -1 })
       .skip(skipBy)
       .limit(50);
     response.posts = posts;
@@ -117,7 +117,9 @@ postController.getSinglePostAndComments = async (req, res) => {
     let post = await Post.findById(req.params.id);
     if (post) {
       // Find all the comments
-      let comments = await Comment.find({ post: req.params.id });
+      let comments = await Comment.find({ post: req.params.id }).sort({
+        score: -1
+      });
       response.success = true;
       response.post = post;
       response.comments = comments;
@@ -166,6 +168,16 @@ postController.upvote = async (req, res) => {
             { new: true }
           );
         }
+
+        // Now update the score
+        let score =
+          updatedPost.upvotedby.length - updatedPost.downvotedby.length;
+        updatedPost = await Post.findByIdAndUpdate(
+          postId,
+          { score },
+          { new: true }
+        );
+
         // Send the updated comment back to the client for storing & display
         response.success = true;
         response.post = updatedPost;
@@ -218,6 +230,16 @@ postController.downvote = async (req, res) => {
             { new: true }
           );
         }
+
+        // Now update the score
+        let score =
+          updatedPost.upvotedby.length - updatedPost.downvotedby.length;
+        updatedPost = await Post.findByIdAndUpdate(
+          postId,
+          { score },
+          { new: true }
+        );
+
         // Send the updated comment back to the client for storing & display
         response.success = true;
         response.post = updatedPost;
