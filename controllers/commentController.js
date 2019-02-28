@@ -1,6 +1,7 @@
 const commentController = {};
 const Comment = require('../models/Comment');
 const User = require('../models/User');
+const helpers = require('../helpers/helpers');
 
 // Get all comments for a single post
 commentController.allComments = async (req, res) => {
@@ -19,12 +20,18 @@ commentController.allComments = async (req, res) => {
 commentController.submitComment = async (req, res) => {
   let response = {};
   try {
-    let comment = new Comment(req.body);
-    await comment.save();
-    response.message = 'Successfully posted a comment';
-    response.success = true;
-    response.comment = comment;
-    res.json(response);
+    req.body.comment = helpers.spamFilter(req.body.comment);
+    if (req.body.comment) {
+      let comment = new Comment(req.body);
+      await comment.save();
+      response.message = 'Successfully posted a comment';
+      response.success = true;
+      response.comment = comment;
+      res.json(response);
+    } else {
+      response.message = `Could not post comment`;
+      res.json(response);
+    }
   } catch (error) {
     response.message = `Server encountered an error while posting a comment ${error}`;
     res.json(response);
