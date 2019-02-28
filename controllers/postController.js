@@ -92,25 +92,34 @@ postController.getNextPosts = async (req, res) => {
 postController.submitNewPost = async (req, res) => {
   let response = {};
   try {
-    let post = new Post(req.body);
-    post.upvotedby = req.body.author;
-    await post.save();
+    let { title, text } = req.body;
+    req.body.title = helpers.spamFilter(title);
+    req.body.text = helpers.spamFilter(text);
 
-    // Also add this post to user upvotes
-    let user = await User.findByIdAndUpdate(
-      { _id: req.body.author },
-      {
-        $addToSet: { upvotes: post._id }
-      },
-      { new: true }
-    );
+    if (req.body.title) {
+      let post = new Post(req.body);
+      post.upvotedby = req.body.author;
+      await post.save();
 
-    // TODO Delete the sensitive info from user
+      // Also add this post to user upvotes
+      let user = await User.findByIdAndUpdate(
+        { _id: req.body.author },
+        {
+          $addToSet: { upvotes: post._id }
+        },
+        { new: true }
+      );
 
-    response.post = post;
-    response.user = helpers.stripTheUserData(user);
-    response.success = true;
-    res.json(response);
+      // TODO Delete the sensitive info from user
+
+      response.post = post;
+      response.user = helpers.stripTheUserData(user);
+      response.success = true;
+      res.json(response);
+    } else {
+      response.message = `Could not submit post`;
+      res.json(response);
+    }
   } catch (error) {
     response.message = `Could not submit post, check error: ${error}`;
     res.json(response);

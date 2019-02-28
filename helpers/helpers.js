@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const helpers = {};
+const spamList = require('naughty-string-validator').getNaughtyStringList();
 
 helpers.hashThePassword = (password, salt) => {
   password =
@@ -30,6 +31,46 @@ helpers.stripTheUserData = (userObject) => {
     return userObject;
   } else {
     return {};
+  }
+};
+
+function spamWordFilter(inputText) {
+  let pass = false;
+  inputText.split(' ').forEach((word) => {
+    if (word.length > 30) {
+      // Check if it's an url
+      if (
+        word.includes('www.') ||
+        word.includes('.com') ||
+        word.includes('http') ||
+        word.includes('@')
+      ) {
+        // Pass the word
+        pass = true;
+      } else {
+        pass = false;
+      }
+    } else {
+      pass = true;
+    }
+  });
+
+  if (pass) {
+    return inputText;
+  } else {
+    return '';
+  }
+}
+
+helpers.spamFilter = (inputText) => {
+  inputText = spamWordFilter(inputText);
+
+  if (!inputText) return '';
+
+  if (spamList.includes(inputText) || inputText.includes('<script>')) {
+    return '';
+  } else {
+    return inputText;
   }
 };
 
