@@ -39,19 +39,30 @@ commentController.submitComment = async (req, res) => {
 };
 
 commentController.deleteComment = async (req, res) => {
-  // TODO please delete if the user owns the comment
   let response = {};
   try {
-    let comment = await Comment.findById(req.params.id);
+    // Get the comment and user id
+    let commentId = req.params.id;
+    let userId = req.body._id;
+    // Find the comment to be deleted
+    let comment = await Comment.findById(commentId);
     if (comment) {
-      // Check if the user is admin or owner of the comment
-      if (comment.author == req.body._id) {
-        await Comment.findByIdAndDelete(req.params.id);
-        response.success = true;
-        res.json(response);
+      // Now check the given user
+      let user = await User.findById(userId);
+      if (user) {
+        // Check if the user exists, is admin or owner of the comment
+        if (user._id.toString() == comment.author.toString() || user.isAdmin) {
+          await Comment.findByIdAndDelete(commentId);
+          response.success = true;
+          res.json(response);
+        } else {
+          // You don't own this comment
+          response.message = "You can't delete that comment";
+          res.json(response);
+        }
       } else {
-        // You don't own this comment
-        response.message = "You can't delete that comment";
+        // The user is not authorized
+        response.message = 'You are not authorized to do that';
         res.json(response);
       }
     } else {
