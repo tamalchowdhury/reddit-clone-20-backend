@@ -2,6 +2,7 @@ const router = require('express').Router();
 const postController = require('../controllers/postController');
 const userController = require('../controllers/userController');
 const commentController = require('../controllers/commentController');
+const appController = require('../controllers/appController');
 
 // Get all the posts in the app
 router.get('/posts/all', postController.getAllPosts);
@@ -102,6 +103,15 @@ router.delete(
   '/user/:username',
   postController.verifyToken,
   userController.deleteUser
+);
+
+// App Settings
+router.get('/app/content', appController.readFileContents);
+
+router.put(
+  '/app/update',
+  postController.verifyToken,
+  appController.updateSettings
 );
 
 module.exports = router;
