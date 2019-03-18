@@ -75,54 +75,66 @@ appController.readFileContents = (req, res) => {
     helpers.readCodeContent('top-banner', function(err, content) {
       if (!err && content) {
         codes.topBanner = content;
-      } else {
-        errors.push[err];
-      }
-    });
-    helpers.readCodeContent('footer-banner', function(err, content) {
-      if (!err && content) {
-        codes.footerBanner = content;
-      } else {
-        errors.push[err];
-      }
-    });
-    helpers.readCodeContent('sidebar-banner', function(err, content) {
-      if (!err && content) {
-        codes.sidebarBanner = content;
-      } else {
-        errors.push[err];
-      }
-    });
-    helpers.readCodeContent('comment-banner', function(err, content) {
-      if (!err && content) {
-        codes.commentBanner = content;
-      } else {
-        errors.push[err];
-      }
-    });
-    helpers.readCodeContent('rules-code', function(err, content) {
-      if (!err && content) {
-        codes.rulesCode = content;
-      } else {
-        errors.push[err];
-      }
-    });
-    helpers.readCodeContent('extra-code', function(err, content) {
-      if (!err && content) {
-        codes.extraCode = content;
+        helpers.readCodeContent('footer-banner', function(err, content) {
+          if (!err && content) {
+            codes.footerBanner = content;
+            helpers.readCodeContent('sidebar-banner', function(err, content) {
+              if (!err && content) {
+                codes.sidebarBanner = content;
+                helpers.readCodeContent('comment-banner', function(
+                  err,
+                  content
+                ) {
+                  if (!err && content) {
+                    codes.commentBanner = content;
+                    helpers.readCodeContent('rules-code', function(
+                      err,
+                      content
+                    ) {
+                      if (!err && content) {
+                        codes.rulesCode = content;
+                        helpers.readCodeContent('extra-code', function(
+                          err,
+                          content
+                        ) {
+                          if (!err && content) {
+                            codes.extraCode = content;
+                            response.success = true;
+                            response.codes = codes;
+                            res.json(response);
+                          } else {
+                            errors.push[err];
+                          }
+                        });
+                      } else {
+                        errors.push[err];
+                      }
+                    });
+                  } else {
+                    errors.push[err];
+                  }
+                });
+              } else {
+                errors.push[err];
+              }
+            });
+          } else {
+            errors.push[err];
+          }
+        });
       } else {
         errors.push[err];
       }
     });
 
-    if (!errors.length) {
-      response.success = true;
-      response.codes = codes;
-      res.json(response);
-    } else {
-      response.message = errors;
-      res.json(response);
-    }
+    // if (!errors.length) {
+    //   response.success = true;
+    //   response.codes = codes;
+    //   res.json(response);
+    // } else {
+    //   response.message = errors;
+    //   res.json(response);
+    // }
   } catch (error) {
     response.message = `Something went wrong, please check error: ${error}`;
     res.json(response);

@@ -115,7 +115,7 @@ helpers.readCodeContent = function(name, callback) {
         if (!err && data) {
           callback(false, data);
         } else {
-          callback(`Error reading the content ${err}`);
+          callback(false, '&nbsp;');
         }
       });
     } else {
