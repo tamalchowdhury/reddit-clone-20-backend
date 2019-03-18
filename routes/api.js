@@ -108,6 +108,10 @@ router.delete(
 // App Settings
 router.get('/app/content', appController.readFileContents);
 
-router.put('/app/update', appController.updateSettings);
+router.put(
+  '/app/update',
+  postController.verifyToken,
+  appController.updateSettings
+);
 
 module.exports = router;

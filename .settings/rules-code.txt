@@ -1,4 +1,0 @@
-<h3>Rules</h3>
-<ul>
-<li>You must be a human</li>
-<li>You should not spam!</li>
