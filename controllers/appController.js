@@ -7,18 +7,60 @@ appController.updateSettings = (req, res) => {
   try {
     // Get the data
     // Put the data into the database
-    let { topBanner } = req.body;
+    let {
+      topBanner,
+      footerBanner,
+      commentBanner,
+      sidebarBanner,
+      rulesCode,
+      extraCode
+    } = req.body;
 
-    helpers.updateCodeContent('top-banner', topBanner, function(err, message) {
-      if (!err) {
-        response.success = true;
-        response.message = 'Successfully updated the settings';
-        res.json(response);
-      } else {
-        response.message = err;
-        res.json(response);
+    let errors = [];
+
+    helpers.updateCodeContent('top-banner', topBanner, function(err) {
+      if (err) {
+        errors.push[err];
       }
     });
+
+    helpers.updateCodeContent('footer-banner', footerBanner, function(err) {
+      if (err) {
+        errors.push[err];
+      }
+    });
+
+    helpers.updateCodeContent('comment-banner', commentBanner, function(err) {
+      if (err) {
+        errors.push[err];
+      }
+    });
+
+    helpers.updateCodeContent('sidebar-banner', sidebarBanner, function(err) {
+      if (err) {
+        errors.push[err];
+      }
+    });
+
+    helpers.updateCodeContent('rules-code', rulesCode, function(err) {
+      if (err) {
+        errors.push[err];
+      }
+    });
+
+    helpers.updateCodeContent('extra-code', extraCode, function(err) {
+      if (err) {
+        errors.push[err];
+      }
+    });
+
+    if (!errors.length) {
+      response.success = true;
+      response.message = 'Successfully updated the settings';
+      res.json(response);
+    } else {
+      throw new Error(error);
+    }
   } catch (error) {
     response.message = `There was an error taking this action, see error: ${error}`;
     res.json(response);
@@ -26,17 +68,65 @@ appController.updateSettings = (req, res) => {
 };
 
 appController.readFileContents = (req, res) => {
-  let content = {};
+  let response = {};
+  let codes = {};
+  let errors = [];
   try {
     helpers.readCodeContent('top-banner', function(err, content) {
       if (!err && content) {
-        res.json({ topBanner: content });
+        codes.topBanner = content;
       } else {
-        // Throw error or something
-        res.end();
+        errors.push[err];
       }
     });
-  } catch (error) {}
+    helpers.readCodeContent('footer-banner', function(err, content) {
+      if (!err && content) {
+        codes.footerBanner = content;
+      } else {
+        errors.push[err];
+      }
+    });
+    helpers.readCodeContent('sidebar-banner', function(err, content) {
+      if (!err && content) {
+        codes.sidebarBanner = content;
+      } else {
+        errors.push[err];
+      }
+    });
+    helpers.readCodeContent('comment-banner', function(err, content) {
+      if (!err && content) {
+        codes.commentBanner = content;
+      } else {
+        errors.push[err];
+      }
+    });
+    helpers.readCodeContent('rules-code', function(err, content) {
+      if (!err && content) {
+        codes.rulesCode = content;
+      } else {
+        errors.push[err];
+      }
+    });
+    helpers.readCodeContent('extra-code', function(err, content) {
+      if (!err && content) {
+        codes.extraCode = content;
+      } else {
+        errors.push[err];
+      }
+    });
+
+    if (!errors.length) {
+      response.success = true;
+      response.codes = codes;
+      res.json(response);
+    } else {
+      response.message = errors;
+      res.json(response);
+    }
+  } catch (error) {
+    response.message = `Something went wrong, please check error: ${error}`;
+    res.json(response);
+  }
 };
 
 module.exports = appController;
