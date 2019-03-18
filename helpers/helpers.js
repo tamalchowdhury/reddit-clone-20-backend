@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const helpers = {};
 const spamList = require('naughty-string-validator').getNaughtyStringList();
 
@@ -72,6 +74,54 @@ helpers.spamFilter = (inputText) => {
   } else {
     return inputText;
   }
+};
+
+let basedir = path.join(__dirname, `../.settings/`);
+
+helpers.updateCodeContent = function(name, content, callback) {
+  fs.open(path.join(`${basedir}${name}.txt`), 'wx', function(
+    err,
+    fileDescriptor
+  ) {
+    if (!err && fileDescriptor) {
+      fs.writeFile(fileDescriptor, content, function(err) {
+        if (!err) {
+          callback(false, 'Successfully updated with new content file');
+        } else {
+          callback(
+            `There was an error updating this file, check error: ${err}`
+          );
+        }
+      });
+    } else {
+      // File does not exists so create one:
+      fs.writeFile(`${basedir}${name}.txt`, content, function(err) {
+        if (!err) {
+          callback(false, 'Successfully created a new content file');
+        } else {
+          callback(
+            `There was an error creating this file, check error: ${err}`
+          );
+        }
+      });
+    }
+  });
+};
+
+helpers.readCodeContent = function(name, callback) {
+  fs.open(`${basedir}${name}.txt`, 'r', function(err, fileDescriptor) {
+    if (!err && fileDescriptor) {
+      fs.readFile(fileDescriptor, 'utf-8', function(err, data) {
+        if (!err && data) {
+          callback(false, data);
+        } else {
+          callback(`Error reading the content ${err}`);
+        }
+      });
+    } else {
+      callback(`There was an error opening the file ${err}`, false);
+    }
+  });
 };
 
 module.exports = helpers;
