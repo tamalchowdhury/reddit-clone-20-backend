@@ -1,12 +1,13 @@
 const appController = {};
-const Widget = require('../models/Widget');
 const helpers = require('../helpers/helpers');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 
-appController.updateSettings = (req, res) => {
+appController.updateSettings = async (req, res) => {
   let response = {};
+  // Verify if the user has admin access!
   try {
-    // Get the data
-    // Put the data into the database
     let {
       topBanner,
       footerBanner,
@@ -18,48 +19,57 @@ appController.updateSettings = (req, res) => {
 
     let errors = [];
 
-    helpers.updateCodeContent('top-banner', topBanner, function(err) {
-      if (err) {
-        errors.push[err];
-      }
-    });
+    let recievedToken = req.headers.authorization.split(' ')[1];
+    let decodedToken = jwt.verify(recievedToken, config.secret);
+    let validUser = await User.findById(decodedToken._id);
 
-    helpers.updateCodeContent('footer-banner', footerBanner, function(err) {
-      if (err) {
-        errors.push[err];
-      }
-    });
+    if (validUser && validUser.isAdmin) {
+      helpers.updateCodeContent('top-banner', topBanner, function(err) {
+        if (err) {
+          errors.push[err];
+        }
+      });
 
-    helpers.updateCodeContent('comment-banner', commentBanner, function(err) {
-      if (err) {
-        errors.push[err];
-      }
-    });
+      helpers.updateCodeContent('footer-banner', footerBanner, function(err) {
+        if (err) {
+          errors.push[err];
+        }
+      });
 
-    helpers.updateCodeContent('sidebar-banner', sidebarBanner, function(err) {
-      if (err) {
-        errors.push[err];
-      }
-    });
+      helpers.updateCodeContent('comment-banner', commentBanner, function(err) {
+        if (err) {
+          errors.push[err];
+        }
+      });
 
-    helpers.updateCodeContent('rules-code', rulesCode, function(err) {
-      if (err) {
-        errors.push[err];
-      }
-    });
+      helpers.updateCodeContent('sidebar-banner', sidebarBanner, function(err) {
+        if (err) {
+          errors.push[err];
+        }
+      });
 
-    helpers.updateCodeContent('extra-code', extraCode, function(err) {
-      if (err) {
-        errors.push[err];
-      }
-    });
+      helpers.updateCodeContent('rules-code', rulesCode, function(err) {
+        if (err) {
+          errors.push[err];
+        }
+      });
 
-    if (!errors.length) {
-      response.success = true;
-      response.message = 'Successfully updated the settings';
-      res.json(response);
+      helpers.updateCodeContent('extra-code', extraCode, function(err) {
+        if (err) {
+          errors.push[err];
+        }
+      });
+      if (!errors.length) {
+        response.success = true;
+        response.message = 'Successfully updated the settings';
+        res.json(response);
+      } else {
+        response.message = 'Something went wrong';
+        res.json(response);
+      }
     } else {
-      throw new Error(error);
+      response.message = 'You are not authorized to perform this action!';
+      res.json(response);
     }
   } catch (error) {
     response.message = `There was an error taking this action, see error: ${error}`;
