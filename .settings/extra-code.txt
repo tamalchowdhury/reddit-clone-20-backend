@@ -1,1 +1,1 @@
-&nbsp;
+<small>&copy;Reddit Inc. "Reddit Clone" Developed in 2019 by <a href="https://tamalweb.com?from=reddit20" target="_blank">Tamal Anwar</a> as a learning project.</small>

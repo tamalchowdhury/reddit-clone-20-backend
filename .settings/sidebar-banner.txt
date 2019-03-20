@@ -1,1 +1,1 @@
-<a href="https://www.bluehost.com/track/xtamal/" target="_blank"> <img border="0" src="https://bluehost-cdn.com/media/partner/images/xtamal/300x250/300x250BW.png"> </a>
+<img src="https://via.placeholder.com/300x250"/>

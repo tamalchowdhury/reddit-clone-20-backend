@@ -1,1 +1,21 @@
-&nbsp;
+<h3>Application Trivia</h3>
+<ul>
+  <li>
+    Made possible using Node.js, Express.js, React.js, Create React App,
+    MongoDB, JSON Web Token, and various other tools.
+  </li>
+  <li>
+    Fully featured front end and backend system. Users can signup, login, make a
+    post, comment on posts, up/down vote on comments and posts. Posts are being
+    ranked by the number of votes.
+  </li>
+  <li>
+    This application features a set of hooks, which lets the admin user to
+    easily put ads and content like this within the front end.
+  </li>
+  <li>
+    Suggestions and bug reports are welcome via my Twitter:
+    <a href="https://twitter.com/tamalanwar" target="_blank">@TamalAnwar</a>
+  </li>
+  <li>Will be writing a post about this app, so keep an eye on my blog.</li>
+</ul>
