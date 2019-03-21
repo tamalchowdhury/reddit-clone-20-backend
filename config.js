@@ -17,6 +17,6 @@ config.production = {
 };
 
 // Change before deploying
-let envToExport = config.development;
+let envToExport = config.production;
 
 module.exports = envToExport;
