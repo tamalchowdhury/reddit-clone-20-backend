@@ -12,16 +12,11 @@ config.production = {
   name: 'production',
   httpPort: 8080,
   httpsPort: 443,
-  database: 'mongodb://tamal:reddit2@ds119930.mlab.com:19930/reddit-clone-20',
+  database: 'mongodb://127.0.0.1:27017/sports-nerd-1',
   secret: 'whateverIlike'
 };
 
-let envToExport = {};
-
-if (process.env.NODE_ENV == 'production') {
-  envToExport = config.production;
-} else {
-  envToExport = config.development;
-}
+// Change before deploying
+let envToExport = config.development;
 
 module.exports = envToExport;

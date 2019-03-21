@@ -275,16 +275,36 @@ postController.downvote = async (req, res) => {
 };
 
 postController.deletePost = async (req, res) => {
-  // TODO Check if the user owns the post or if the user is an admin
   let response = {};
   try {
-    await Post.findByIdAndDelete({ _id: req.params.id });
-    response.success = true;
-    response.message = 'Successfully deleted the post!';
-    response.deletedId = req.params.id;
-    res.json(response);
+    let userId = req.body._id;
+    let postId = req.params.id;
+
+    // Find the user
+    let authorizedUser = await User.findById(userId);
+
+    if (authorizedUser) {
+      let postToDelete = await Post.findById(postId);
+
+      if (
+        authorizedUser.isAdmin ||
+        postToDelete.author.toString() == userId.toString()
+      ) {
+        await Post.findByIdAndDelete(postId);
+        response.success = true;
+        response.message = 'Successfully deleted the post!';
+        response.deletedId = postId;
+        res.json(response);
+      } else {
+        response.message = 'You are not authorized to perform this action!';
+        res.json(response);
+      }
+    } else {
+      response.message = 'The user could not be found';
+      res.json(response);
+    }
   } catch (error) {
-    response.message = 'Could not delete';
+    response.message = `Could not delete, see error: ${error}`;
     res.json(response);
   }
 };
