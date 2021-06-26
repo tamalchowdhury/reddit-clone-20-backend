@@ -1,18 +1,54 @@
-# Reddit Clone
+# Reddit Clone Backend
 
-Install node version `8.12.0`,
+Reddit Clone MVC app made with React.js, Node.js, Express.js & MongoDB
 
-[Use these instructions](https://hackernoon.com/deploying-a-node-app-on-amazon-ec2-d2fb9a6757eb) to install a specific version using nvm. 
+[Live Demo](https://reddit-clone-20.herokuapp.com/)
 
-Install npm version `6.4.1`,
-Install yarn version `1.7.0`
+[Video Demo](https://www.youtube.com/watch?v=isD8eEcNyv0) (in case the live site is broken)
 
-Type `yarn` to install dependencies.
+[Frontend code](https://github.com/tamalweb/reddit-clone-20)
 
-Follow [this tut from digital ocean](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04) to configure the server with nginx.
+![Reddit Clone](https://raw.githubusercontent.com/tamalweb/reddit-clone-20/master/screenshot.png)
 
-Please go to `config.js` and change the database to the mongodb database of your production database
+## To run the project
 
-Good luck!
+You only need to have this backend project to run the full app. After building the React app, I put the generated files into the `/client` folder in this project.
 
-Reach me via email: `hello @ tamalweb.com`
+Download the fronend source code:
+
+`git clone https://github.com/tamalweb/reddit-clone-20.git`
+
+Download the backend source code:
+
+`git clone https://github.com/tamalweb/reddit-clone-20-backend.git`
+
+Go to each of the directories and install the dependencies:
+
+`npm install`
+
+Run the backend:
+
+`npm run dev`
+
+Run the frontend:
+
+`npm start`
+
+The app will start on `localhost:3000` and the backend server will run on `localhost:8080`
+
+You will need node version `8.12.0` for this to work because some driver dependencies have updated. Install Node Version Manager (NVM) to install that specific version and run this project. ![See this page for NVM instructions](https://tamalweb.com/which-nodejs-version#how-to-install-nvm-for-windows-computers)
+
+For time constraints, I haven't updated the project to run on newer drivers and Node versions, so if you update the app, please do send me a PR, I would appreciate the update.
+
+## Database
+
+Provide your own MongoDB database driver and secret text.
+
+Rename `sample.env` to just `.env` and set the DATABASE and SECRET with your own info like this:
+
+```
+DATABASE=mongodb://database_info
+SECRET=RandomText
+```
+
+You can get free sandbox mongoDB hostin from [MongoDB Atlas](https://www.mongodb.com/)
