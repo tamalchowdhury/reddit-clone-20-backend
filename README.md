@@ -36,7 +36,7 @@ Run the frontend:
 
 The app will start on `localhost:3000` and the backend server will run on `localhost:8080`
 
-You will need node version `8.12.0` for this to work because some driver dependencies have updated. Install Node Version Manager (NVM) to install that specific version and run this project. ![See this page for NVM instructions](https://tamalweb.com/which-nodejs-version#how-to-install-nvm-for-windows-computers)
+You will need node version `8.12.0` for this to work because some driver dependencies have updated. Install Node Version Manager (NVM) to install that specific version and run this project. [See this page for NVM instructions](https://tamalweb.com/which-nodejs-version#how-to-install-nvm-for-windows-computers)
 
 For time constraints, I haven't updated the project to run on newer drivers and Node versions, so if you update the app, please do send me a PR, I would appreciate the update.
 
@@ -51,4 +51,4 @@ DATABASE=mongodb://database_info
 SECRET=RandomText
 ```
 
-You can get free sandbox mongoDB hostin from [MongoDB Atlas](https://www.mongodb.com/)
+You can get free sandbox mongoDB hosting from [MongoDB Atlas](https://www.mongodb.com/)
